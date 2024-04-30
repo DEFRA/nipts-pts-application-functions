@@ -14,6 +14,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Defra.PTS.Functions.Functions
 {
+    /// <summary>
+    /// Heath Check function
+    /// </summary>
     public class HealthCheck
     {
         private readonly IApplicationService _applicationService;
