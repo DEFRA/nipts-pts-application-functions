@@ -13,7 +13,7 @@ namespace Defra.PTS.Application.Entities
         public string? OwnerNewName { get; set; }
         public string? OwnerNewTelephone { get; set; }
         public Guid? OwnerAddressId { get; set; }
-        public string ReferenceNumber { get; set; }
+        public string? ReferenceNumber { get; set; }
         public bool IsDeclarationSigned { get; set; }
         public bool IsConsentAgreed { get; set; }
         public bool IsPrivacyPolicyAgreed { get; set; }

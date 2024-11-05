@@ -14,19 +14,30 @@ using Microsoft.Extensions.Configuration;
 
 namespace Defra.PTS.Functions.Functions
 {
-    public class HealthCheck
+    /// <summary>
+    /// Health check endpoint
+    /// </summary>
+    /// <remarks>
+    /// Health check dependancies
+    /// </remarks>
+    /// <param name="applicationService"></param>
+    public class HealthCheck(IApplicationService applicationService)
     {
-        private readonly IApplicationService _applicationService;
-        public HealthCheck(IApplicationService applicationService)
-        {
-            _applicationService = applicationService;
-        }
+        private readonly IApplicationService _applicationService = applicationService;
 
+        /// <summary>
+        /// Check service health
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="log"></param>
+        /// <returns></returns>
         [FunctionName("HealthCheck")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
+        [OpenApiOperation(operationId: "Run", tags: ["name"])]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public async Task<IActionResult> Run(
+#pragma warning disable IDE0060 // Remove unused parameter
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "health")] HttpRequest req
+#pragma warning restore IDE0060 // Remove unused parameter
             , ILogger log)
         {
             log.LogInformation("Health Check Trigger.");

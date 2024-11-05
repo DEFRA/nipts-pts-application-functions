@@ -1,25 +1,19 @@
 ﻿using Defra.PTS.Application.Repositories.Interfaces;
 using Defra.PTS.Application.Api.Services.Interface;
-using Microsoft.Extensions.Logging;
-using entity = Defra.PTS.Application.Entities;
+using modelEntity = Defra.PTS.Application.Entities;
 using Defra.PTS.Application.Models.CustomException;
 using Defra.PTS.Application.Entities;
 
 namespace Defra.PTS.Application.Api.Services.Implementation
 {
-    public class TravelDocumentService : ITravelDocumentService
+    public class TravelDocumentService(
+        ITravelDocumentRepository travelDocumentRepository
+            , IReferenceGeneratorService referenceGeneratorService) : ITravelDocumentService
     {        
-        private readonly ITravelDocumentRepository _travelDocumentRepository;
-        private readonly IReferenceGeneratorService _referenceGeneratorService;
-        public TravelDocumentService(              
-            ITravelDocumentRepository travelDocumentRepository
-            , IReferenceGeneratorService referenceGeneratorService)
-        {            
-            _travelDocumentRepository = travelDocumentRepository;
-            _referenceGeneratorService = referenceGeneratorService;
-        }
+        private readonly ITravelDocumentRepository _travelDocumentRepository = travelDocumentRepository;
+        private readonly IReferenceGeneratorService _referenceGeneratorService = referenceGeneratorService;
 
-        public async Task<TravelDocument> CreateTravelDocument(entity.Application application)
+        public async Task<TravelDocument> CreateTravelDocument(modelEntity.Application application)
         {
 
             try
@@ -46,16 +40,18 @@ namespace Defra.PTS.Application.Api.Services.Implementation
             }
         }
 
-        public static Task<TravelDocument> GetTravelDocumentAsync(entity.Application application)
-        {            
-            var travelDocument = new TravelDocument();
-            travelDocument.ApplicationId = application.Id;
-            travelDocument.PetId = application.PetId;
-            travelDocument.OwnerId = application.OwnerId;         
-            travelDocument.CreatedOn = application.CreatedOn;
-            travelDocument.CreatedBy = application.CreatedBy;
-            travelDocument.IsLifeTIme = true;            
-            travelDocument.DocumentSignedBy = "John Smith (APHA)";
+        public static Task<TravelDocument> GetTravelDocumentAsync(modelEntity.Application application)
+        {
+            var travelDocument = new TravelDocument
+            {
+                ApplicationId = application.Id,
+                PetId = application.PetId,
+                OwnerId = application.OwnerId,
+                CreatedOn = application.CreatedOn,
+                CreatedBy = application.CreatedBy,
+                IsLifeTIme = true,
+                DocumentSignedBy = "John Smith (APHA)"
+            };
             return Task.FromResult(travelDocument);
         }
     }

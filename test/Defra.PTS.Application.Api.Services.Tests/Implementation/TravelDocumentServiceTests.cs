@@ -5,7 +5,7 @@ using Defra.PTS.Application.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using entity = Defra.PTS.Application.Entities;
+using applicationEntity = Defra.PTS.Application.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +38,7 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
         {
             // Arrange
             Guid guid = Guid.Empty;
-            var application = new entity.Application(); // assuming you have a valid application instance
+            var application = new applicationEntity.Application(); // assuming you have a valid application instance
             var travelDocumentDB = new TravelDocument(); // assuming you have a valid travel document instance
             var travelDocumentReference = "ABC123"; // assuming a valid travel document reference
 
@@ -62,7 +62,7 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
         public void CreateTravelDocument_InvalidReference_ThrowsException()
         {
             // Arrange
-            var application = new entity.Application(); // assuming you have a valid application instance
+            var application = new applicationEntity.Application(); // assuming you have a valid application instance
 
             _referenceGeneratorServiceMock.Setup(service => service.GetTravelDocumentReference())
                                          .ReturnsAsync(string.Empty); // simulate invalid reference

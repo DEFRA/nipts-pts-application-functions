@@ -1,4 +1,4 @@
-﻿using entity = Defra.PTS.Application.Entities;
+﻿using modelEntity = Defra.PTS.Application.Entities;
 using Defra.PTS.Application.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -7,13 +7,13 @@ using System.Diagnostics.CodeAnalysis;
 namespace Defra.PTS.Application.Repositories.Implementation
 {
     [ExcludeFromCodeCoverageAttribute]
-    public class TravelDocumentRepository : Repository<entity.TravelDocument>, ITravelDocumentRepository
+    public class TravelDocumentRepository : Repository<modelEntity.TravelDocument>, ITravelDocumentRepository
     {        
-        private AppDbContext appContext
+        private AppDbContext AppContext
         {
             get
             {
-                return _dbContext as AppDbContext;
+                return (AppDbContext)_dbContext;
             }
         }
         public TravelDocumentRepository(DbContext dbContext) : base(dbContext)
@@ -23,7 +23,7 @@ namespace Defra.PTS.Application.Repositories.Implementation
              
         public async Task<bool> DoesTravelDocumentReferenceNumberExists(string documentRefrenceNumber)
         {
-            return await appContext.TravelDocument.AnyAsync(a => a.DocumentReferenceNumber == documentRefrenceNumber);
+            return await AppContext.TravelDocument.AnyAsync(a => a.DocumentReferenceNumber == documentRefrenceNumber);
         }        
     }
 }

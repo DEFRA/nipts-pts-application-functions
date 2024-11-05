@@ -36,27 +36,48 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
             _sut = new ApplicationDetails(_applicationServiceMoq.Object, _loggerMock.Object);
         }
 
-        [Test]
-        public void GetApplicationDetails_WhenRequestDoesntExist_Then_ReturnsUserException()
+        [TearDown]
+        public void TearDown() 
         {
-            var expectedResult = $"Invalid Application Id input, is NUll or Empty";
-            var result = Assert.ThrowsAsync<ApplicationFunctionException>(() => _sut!.GetApplicationDetails(null));
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual(expectedResult, result!.Message);
+            _applicationServiceMoq.Reset();
         }
 
         [Test]
-        public void GetApplicationDetails_WhenRequestBodyDoesntExist_Then_ReturnsUserException()
+        public async Task GetApplicationDetails_WhenRequestDoesntExist_Then_ReturnsNotFound()
         {
-            var expectedResult = $"Invalid Application Id input, is NUll or Empty";
+            var applicationId = Guid.NewGuid();
+
+            var json = "{\"ApplicationId\":\"00000000-0000-0000-0000-000000000000\"}";
+            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            _requestMoq!.Setup(a => a.Body).Returns(memoryStream);
+
+            _applicationServiceMoq.Setup(service => service.GetApplicationDetails(applicationId))
+                                   .ThrowsAsync(new Exception());
+            
+            var result = await _sut!.GetApplicationDetails(_requestMoq.Object);
+
+            var notFoundResult = result as NotFoundObjectResult;
+
+            Assert.IsInstanceOf<NotFoundObjectResult>(notFoundResult);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual($"No application found for id {Guid.Empty}", notFoundResult!.Value);
+        }
+
+        [Test]
+        public async Task GetApplicationDetails_WhenRequestBodyDoesntExist_Then_ReturnsUserException()
+        {
+            var expectedResult = $"Failed to retrieve application details";
             
             _requestMoq!.Setup(a => a.Body).Returns(value: null!);
 
-            var result = Assert.ThrowsAsync<ApplicationFunctionException>(() => _sut!.GetApplicationDetails(_requestMoq.Object));
+            var result = await _sut!.GetApplicationDetails(_requestMoq.Object);            
 
+            var badRequestResult = result as BadRequestObjectResult;
+
+            Assert.IsInstanceOf<BadRequestObjectResult>(badRequestResult);
             Assert.IsNotNull(result);
-            Assert.AreEqual(expectedResult, result!.Message);
+            Assert.AreEqual(expectedResult, badRequestResult!.Value);
 
         }
 

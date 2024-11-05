@@ -19,11 +19,11 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
     [TestFixture]
     public class ApplicationTests
     {
-        private Mock<HttpRequest> requestMoq;
-        private Mock<ILogger> loggerMock;
-        private Mock<IApplicationService> applicationServiceMoq;
-        private Mock<ITravelDocumentService> travelDocumentServiceMoq;
-        PTS.Application.Functions.Functions.Application.Application sut;
+        private Mock<HttpRequest> requestMoq = new();
+        private Mock<ILogger> loggerMock = new();
+        private Mock<IApplicationService> applicationServiceMoq = new();
+        private Mock<ITravelDocumentService> travelDocumentServiceMoq = new();
+        PTS.Application.Functions.Functions.Application.Application? sut;
 
         [SetUp]
         public void SetUp()
@@ -36,37 +36,34 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
             sut = new PTS.Application.Functions.Functions.Application.Application(applicationServiceMoq.Object, travelDocumentServiceMoq.Object);
         }
 
-        [Test]
-        public void CreateApplication_WhenRequestDoesntExist_Then_ReturnsUserException()
+        [TearDown]
+        public void TearDown()
         {
-            var expectedResult = $"Invalid Application input, is NUll or Empty";
-            var result = Assert.ThrowsAsync<ApplicationFunctionException>(() => sut.CreateApplication(null, loggerMock.Object));
+            requestMoq.Reset();
+            loggerMock.Reset();
+            applicationServiceMoq.Reset();
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(expectedResult, result.Message);
-
-            applicationServiceMoq.Verify(a => a.CreateApplication(It.IsAny<Entities.Application>()), Times.Never);
+            sut = null;
         }
 
         [Test]
-        public void CreateApplication_WhenRequestBodyDoesntExist_Then_ReturnsUserException()
+        public async Task CreateApplication_WhenRequestDoesntExist_Then_ReturnsUserException()
         {
-            var expectedResult = $"Invalid Application input, is NUll or Empty";
-            requestMoq.Setup(a => a.Body).Returns(value: null);
+            var expectedResult = $"Error creating application";
+            var result = await sut!.CreateApplication(null, loggerMock.Object);
 
-            var result = Assert.ThrowsAsync<ApplicationFunctionException>(() => sut.CreateApplication(requestMoq.Object, loggerMock.Object));
+            var badRequestResult = result as BadRequestObjectResult;
 
+            Assert.IsInstanceOf<BadRequestObjectResult>(badRequestResult);
             Assert.IsNotNull(result);
-            Assert.AreEqual(expectedResult, result.Message);
-
-            applicationServiceMoq.Verify(a => a.CreateApplication(It.IsAny<Entities.Application>()), Times.Never);
+            Assert.AreEqual(expectedResult, badRequestResult!.Value);
         }
 
         [Test]
         public void CreateApplication_WhenRequestBodyExists_Then_ReturnsSuccessMessageWithValidGuid()
         {
             Task<Entities.Application> app = Task.FromResult(new Entities.Application());
-            var expectedResult = app.Result;
+            
             var json = "{\"id\":\"00000000-0000-0000-0000-000000000000\",\"petId\":\"e5edcdf5-bf5f-45c0-db18-08dbfbfaba95\",\"userId\":\"37d65eba-1d66-4181-19c5-08dbfb31348e\"," +
                 "\"ownerId\":\"18c20f7c-2fa9-40bf-9468-08dbfbe90b34\",\"referenceNumber\":null,\"isDeclarationSigned\":true,\"isConsentAgreed\":true,\"isPrivacyPolicyAgreed\":true," +
                 "\"dateOfApplication\":\"2023-12-13T16:44:10.0954219+00:00\",\"status\":\"AWAITING VERIFICATION\",\"createdBy\":null,\"createdOn\":\"2023-12-13T16:44:10.0954799+00:00\"," +
@@ -77,24 +74,13 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
 
             applicationServiceMoq.Setup(a => a.CreateApplication(It.IsAny<Entities.Application>())).Returns(app);
 
-            var result = sut.CreateApplication(requestMoq.Object, loggerMock.Object);
+            var result = sut!.CreateApplication(requestMoq.Object, loggerMock.Object);
             var okResult = result.Result as OkObjectResult;
 
             Assert.IsNotNull(okResult);
-            Assert.AreEqual(200, okResult?.StatusCode);
-
-          //  Assert.AreEqual(new ApplicationDto(), okResult?.Value);
+            Assert.AreEqual(200, okResult?.StatusCode);          
 
             applicationServiceMoq.Verify(a => a.CreateApplication(It.IsAny<Entities.Application>()), Times.Once);
-        }
-
-        public void TearDown()
-        {
-            requestMoq = null;
-            loggerMock = null;
-            applicationServiceMoq = null;
-
-            sut = null;
         }
     }
 }

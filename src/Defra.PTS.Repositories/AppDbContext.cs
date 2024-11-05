@@ -1,4 +1,4 @@
-﻿using entity = Defra.PTS.Application.Entities;
+﻿using modelEntity = Defra.PTS.Application.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 
@@ -13,8 +13,8 @@ namespace Defra.PTS.Application.Repositories
 
         }
 
-        public DbSet<entity.Application> Application { get; set; }
-        public DbSet<entity.VwApplication> VwApplications { get; set; }
-        public DbSet<entity.TravelDocument> TravelDocument { get; set; }
+        public DbSet<modelEntity.Application> Application { get; set; }
+        public DbSet<modelEntity.VwApplication> VwApplications { get; set; }
+        public DbSet<modelEntity.TravelDocument> TravelDocument { get; set; }
     }
 }

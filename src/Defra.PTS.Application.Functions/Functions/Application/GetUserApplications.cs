@@ -18,30 +18,32 @@ namespace Defra.PTS.Application.Functions.Functions.Application;
 /// <summary>
 /// Get user applications
 /// </summary>
-public class GetUserApplications
+/// <remarks>
+/// Get user applications
+/// </remarks>
+/// <param name="applicationService">The application service</param>
+/// <param name="log">The log</param>
+public class GetUserApplications(IApplicationService applicationService, ILogger<GetUserApplications> log)
 {
-    private readonly IApplicationService _applicationService;
-    private readonly ILogger<GetUserApplications> _logger;
+    private readonly IApplicationService _applicationService = applicationService;
+    private readonly ILogger<GetUserApplications> _logger = log;
 
     /// <summary>
-    /// Get user applications
+    /// 
     /// </summary>
-    /// <param name="applicationService">The application service</param>
-    /// <param name="log">The log</param>
-    public GetUserApplications(IApplicationService applicationService, ILogger<GetUserApplications> log)
-    {
-        _applicationService = applicationService;
-        _logger = log;
-    }
-
+    /// <param name="req"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     [FunctionName(nameof(GetUserApplications))]
-    [OpenApiOperation(operationId: nameof(GetUserApplications), tags: new[] { "Applications" })]
+    [OpenApiOperation(operationId: nameof(GetUserApplications), tags: ["Applications"])]
     [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
     [OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "The **UserId** parameter")]
     [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<ApplicationSummaryDto>), Description = "OK")]
     [OpenApiResponseWithBody(statusCode: HttpStatusCode.BadRequest, contentType: "application/json", bodyType:typeof(string), Description = "BAD REQUEST")]
     public async Task<IActionResult> Run(
+#pragma warning disable IDE0060 // Remove unused parameter
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Applications/UserApplications/{userId}")] HttpRequest req, string userId)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         _logger.LogInformation("HTTP trigger function processed a request.",nameof(GetUserApplications));
 
