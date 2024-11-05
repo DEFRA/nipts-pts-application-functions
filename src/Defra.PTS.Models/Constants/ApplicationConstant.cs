@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Defra.PTS.Application.Models.Constants
 {
-    public class ApplicationConstant
+    public static class ApplicationConstant
     {
         public const string AlphaNumericBase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     }
