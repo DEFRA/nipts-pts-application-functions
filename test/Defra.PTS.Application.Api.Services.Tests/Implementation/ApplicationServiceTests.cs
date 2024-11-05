@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
-using entity = Defra.PTS.Application.Entities;
+using modelEntity = Defra.PTS.Application.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +21,10 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
     [TestFixture]
     public class ApplicationServiceTests
     {
-        private Mock<ILogger<ApplicationService>> _loggerMock;
-        private Mock<IApplicationRepository> _applicationRepository;
-        private Mock<IReferenceGeneratorService> _referenceGeneratorService;
-        ApplicationService sut;
+        private Mock<ILogger<ApplicationService>> _loggerMock = new();
+        private Mock<IApplicationRepository> _applicationRepository = new();
+        private Mock<IReferenceGeneratorService> _referenceGeneratorService = new();
+        ApplicationService? sut;
 
         [SetUp]
         public void SetUp()
@@ -40,7 +40,7 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
             var uniqueReferenceNumber = "ABC123XY";
             Guid guid = Guid.Empty;
           
-            var newApplicationItem = new entity.Application
+            var newApplicationItem = new modelEntity.Application
             {
                 // Populate applicationItem with expected values
                 PetId = Guid.NewGuid(),
@@ -55,7 +55,7 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
 
             _referenceGeneratorService.Setup(svc => svc.GetUniqueApplicationReference()).ReturnsAsync(uniqueReferenceNumber);
 
-            var applicationDB = new entity.Application
+            var applicationDB = new modelEntity.Application
             {
                 // Populate applicationDB with expected values
                 PetId = Guid.NewGuid(),
@@ -69,7 +69,8 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
                 DateOfApplication = DateTime.Now
             };
 
-            _applicationRepository.Setup(a => a.Add(applicationDB)).Returns(Task.FromResult(applicationDB.Id = guid));
+            _applicationRepository.Setup(a => a.Add(applicationDB)).Returns(Task.FromResult(guid));
+            applicationDB.Id = guid;
 
             await _applicationRepository.Object.Add(applicationDB);
             _applicationRepository.Setup(a => a.SaveChanges()).ReturnsAsync(1);
@@ -84,11 +85,11 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
         [Test]
         public async Task CreateApplication_WhenInValidValidData_ThrowsCustomException()
         {
-            string uniqueReferenceNumber = null;
+            string? uniqueReferenceNumber = null;
             var expectedResult = $"Cannot create Unique Application Reference";
             Guid guid = Guid.Empty;
 
-            var newApplicationItem = new entity.Application
+            var newApplicationItem = new modelEntity.Application
             {
                 // Populate applicationDB with expected values
                 PetId = Guid.NewGuid(),
@@ -100,24 +101,25 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
                 IsPrivacyPolicyAgreed = true,
                 DateOfApplication = DateTime.Now
             };
+            
+            _referenceGeneratorService.Setup(svc => svc.GetUniqueApplicationReference()).ReturnsAsync(uniqueReferenceNumber);            
 
-            _referenceGeneratorService.Setup(svc => svc.GetUniqueApplicationReference()).ReturnsAsync(uniqueReferenceNumber);
-
-            var applicationDB = new entity.Application
+            var applicationDB = new modelEntity.Application
             {
                 // Populate applicationDB with expected values
                 PetId = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 OwnerId = Guid.NewGuid(),
                 Status = "COMPLETED",
-                ReferenceNumber = uniqueReferenceNumber,
+                ReferenceNumber = null,
                 IsDeclarationSigned = true,
                 IsConsentAgreed = true,
                 IsPrivacyPolicyAgreed = true,
                 DateOfApplication = DateTime.Now
             };
 
-            _applicationRepository.Setup(a => a.Add(applicationDB)).Returns(Task.FromResult(applicationDB.Id = guid));
+            _applicationRepository.Setup(a => a.Add(applicationDB)).Returns(Task.FromResult(guid));
+            applicationDB.Id = guid;
 
             await _applicationRepository.Object.Add(applicationDB);
             _applicationRepository.Setup(a => a.SaveChanges()).ReturnsAsync(1);
@@ -135,7 +137,7 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
         {
             // Arrange
             var id = Guid.NewGuid();
-            var expectedApplication = new entity.Application(); // Assuming entity.Application is your application model
+            var expectedApplication = new modelEntity.Application(); // Assuming entity.Application is your application model
             _applicationRepository.Setup(repo => repo.GetApplication(id))
                                       .Returns(expectedApplication);
 
@@ -194,9 +196,10 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
         {
             // Arrange
             var invalidApplicationId = Guid.Empty; // or any invalid GUID
+            VwApplication? nullApplication = null;
 
-            _applicationRepository.Setup(repo => repo.GetApplicationDetails(invalidApplicationId))
-                                      .ReturnsAsync((VwApplication)null);
+            _ = _applicationRepository.Setup(repo => repo.GetApplicationDetails(invalidApplicationId))
+                                      .ReturnsAsync(nullApplication);
 
             sut = new ApplicationService(_loggerMock.Object, _applicationRepository.Object, _referenceGeneratorService.Object);
 

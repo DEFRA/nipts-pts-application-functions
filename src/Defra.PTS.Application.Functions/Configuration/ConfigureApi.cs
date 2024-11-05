@@ -5,9 +5,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Defra.PTS.Application.Functions.Configuration
 {
-    [ExcludeFromCodeCoverageAttribute]
+    /// <summary>
+    /// Configures service dependancies
+    /// </summary>
+    [ExcludeFromCodeCoverageAttribute]    
     public static class ConfigureApi
     {
+        /// <summary>
+        /// Adds service dependancies
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddDefraApiServices(this IServiceCollection services)
         {
             services.AddScoped<IApplicationService, ApplicationService>();

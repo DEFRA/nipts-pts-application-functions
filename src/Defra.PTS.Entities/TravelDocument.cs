@@ -13,8 +13,8 @@ namespace Defra.PTS.Application.Entities
         public Guid PetId { get; set; }
         public Guid OwnerId { get; set; }
         public Guid ApplicationId { get; set; }        
-        public byte[] QRCode { get; set; }
-        public string DocumentReferenceNumber { get; set; }
+        public byte[]? QRCode { get; set; }
+        public string DocumentReferenceNumber { get; set; } = string.Empty;
         public bool? IsLifeTIme { get; set; }
         public DateTime? ValidityStartDate { get; set; }
         public DateTime? ValidityEndDate { get; set; }
@@ -24,7 +24,7 @@ namespace Defra.PTS.Application.Entities
         public DateTime? CreatedOn { get; set; }
         public Guid? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
-        public string DocumentSignedBy { get; set; }
+        public string DocumentSignedBy { get; set; } = string.Empty;
         
     }
 }

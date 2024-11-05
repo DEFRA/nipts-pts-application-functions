@@ -1,4 +1,4 @@
-﻿using entity = Defra.PTS.Application.Entities;
+﻿using modelEntity = Defra.PTS.Application.Entities;
 using Defra.PTS.Application.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Defra.PTS.Application.Repositories;
@@ -10,14 +10,14 @@ using System.Diagnostics.CodeAnalysis;
 namespace Defra.PTS.Application.Repositories.Implementation
 {
     [ExcludeFromCodeCoverageAttribute]
-    public class ApplicationRepository : Repository<entity.Application>, IApplicationRepository
+    public class ApplicationRepository : Repository<modelEntity.Application>, IApplicationRepository
     {
         private readonly ILogger<ApplicationRepository> _log;
-        private AppDbContext appContext
+        private AppDbContext AppContext
         {
             get
             {
-                return _dbContext as AppDbContext;
+                return (AppDbContext)_dbContext;
             }
         }
         public ApplicationRepository(DbContext dbContext, ILogger<ApplicationRepository> log) : base(dbContext)
@@ -27,34 +27,34 @@ namespace Defra.PTS.Application.Repositories.Implementation
 
         public async Task<VwApplication?> GetApplicationDetails(Guid applicationId)
         {
-            return await appContext.VwApplications.FirstOrDefaultAsync(c => c.ApplicationId == applicationId);
+            return await AppContext.VwApplications.FirstOrDefaultAsync(c => c.ApplicationId == applicationId);
         }
 
         public async Task<IEnumerable<VwApplication>> GetApplicationsForUser(Guid userId)
         {
-            var query = appContext.VwApplications.Where(c => c.UserId == userId);
+            var query = AppContext.VwApplications.Where(c => c.UserId == userId);
             return await query.ToListAsync();
         }
 
-        public entity.Application GetApplication(Guid id)
+        public modelEntity.Application GetApplication(Guid id)
         {
-            return appContext.Application.Include("Address").Include("PetApplicationStatus").Where(c => c.Id == id).FirstOrDefault();
+            return AppContext.Application.Include("Address").Include("PetApplicationStatus").Where(c => c.Id == id).FirstOrDefault()!;
         }
 
         public int DeleteApplication(Guid id)
         {
-            var applicationId = appContext.Application.Where(c => c.Id == id).FirstOrDefault();
+            var applicationId = AppContext.Application.Where(c => c.Id == id).FirstOrDefault();
             if (applicationId != null)
             {
-                appContext.Application.Remove(applicationId);
-                return appContext.SaveChanges();
+                AppContext.Application.Remove(applicationId);
+                return AppContext.SaveChanges();
             }
             return 0;
         }
 
         public async Task<bool> DoesReferenceNumberExists(string referenceNumber)
         {
-            return await appContext.Application.AnyAsync(a => a.ReferenceNumber == referenceNumber);
+            return await AppContext.Application.AnyAsync(a => a.ReferenceNumber == referenceNumber);
         }
 
         public async Task<bool> PerformHealthCheckLogic()
@@ -62,10 +62,10 @@ namespace Defra.PTS.Application.Repositories.Implementation
             try
             {
                 // Attempt to open a connection to the database
-                await appContext.Database.OpenConnectionAsync();
+                await AppContext.Database.OpenConnectionAsync();
 
                 // Check if the connection is open
-                if (appContext.Database.GetDbConnection().State == ConnectionState.Open)
+                if (AppContext.Database.GetDbConnection().State == ConnectionState.Open)
                 {
                     return true;
                 }
@@ -76,8 +76,7 @@ namespace Defra.PTS.Application.Repositories.Implementation
             }
             catch (Exception ex)
             {
-                _log.LogError("Error Stack: " + ex.StackTrace);
-                _log.LogError("Exception Message: " + ex.Message);
+                _log.LogError("Error Stack: {StackTrace} \n Exception Message: {Message}", ex.StackTrace, ex.Message);
                 throw;
             }
         }

@@ -14,12 +14,12 @@ namespace Defra.PTS.Application.Models.Dto
         public Guid PetId { get; set; }
         public Guid UserId { get; set; }
         public Guid OwnerId { get; set; }
-        public string ReferenceNumber { get; set; }
+        public string ReferenceNumber { get; set; } = string.Empty;
         public bool IsDeclarationSigned { get; set; }
         public bool IsConsentAgreed { get; set; }
         public bool IsPrivacyPolicyAgreed { get; set; }
         public DateTime? DateOfApplication { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         public Guid? CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
         public Guid? UpdatedBy { get; set; }
