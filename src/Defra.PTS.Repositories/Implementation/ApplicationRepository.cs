@@ -12,7 +12,6 @@ namespace Defra.PTS.Application.Repositories.Implementation
     [ExcludeFromCodeCoverageAttribute]
     public class ApplicationRepository : Repository<modelEntity.Application>, IApplicationRepository
     {
-        private readonly ILogger<ApplicationRepository> _log;
         private AppDbContext AppContext
         {
             get
@@ -20,9 +19,8 @@ namespace Defra.PTS.Application.Repositories.Implementation
                 return (AppDbContext)_dbContext;
             }
         }
-        public ApplicationRepository(DbContext dbContext, ILogger<ApplicationRepository> log) : base(dbContext)
+        public ApplicationRepository(DbContext dbContext) : base(dbContext)
         {
-            _log = log;
         }
 
         public async Task<VwApplication?> GetApplicationDetails(Guid applicationId)
