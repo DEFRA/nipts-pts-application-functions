@@ -102,7 +102,7 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
                 DateOfApplication = DateTime.Now
             };
             
-            _referenceGeneratorService.Setup(svc => svc.GetUniqueApplicationReference()).ReturnsAsync(uniqueReferenceNumber);            
+            _referenceGeneratorService.Setup(svc => svc.GetUniqueApplicationReference())!.ReturnsAsync(uniqueReferenceNumber);            
 
             var applicationDB = new modelEntity.Application
             {
@@ -111,7 +111,7 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
                 UserId = Guid.NewGuid(),
                 OwnerId = Guid.NewGuid(),
                 Status = "COMPLETED",
-                ReferenceNumber = null,
+                ReferenceNumber = null!,
                 IsDeclarationSigned = true,
                 IsConsentAgreed = true,
                 IsPrivacyPolicyAgreed = true,
@@ -127,9 +127,9 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
 
             sut = new ApplicationService(_loggerMock.Object, _applicationRepository.Object, _referenceGeneratorService.Object);
 
-            ApplicationFunctionException result = Assert.ThrowsAsync<ApplicationFunctionException>(() => sut.CreateApplication(newApplicationItem));
+            ApplicationFunctionException result = Assert.ThrowsAsync<ApplicationFunctionException>(() => sut.CreateApplication(newApplicationItem))!;
             Assert.IsNotNull(result);
-            Assert.AreEqual(expectedResult, result.Message);
+            Assert.AreEqual(expectedResult, result!.Message);
         }
 
         [Test]
