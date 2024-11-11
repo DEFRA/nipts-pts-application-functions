@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Defra.PTS.Application.Models.Enums
 {
-    public enum ApplicationReferenceEnum
+    public enum ApplicationReference
     {
         Length = 8
     }

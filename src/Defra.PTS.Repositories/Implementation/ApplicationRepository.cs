@@ -59,26 +59,19 @@ namespace Defra.PTS.Application.Repositories.Implementation
 
         public async Task<bool> PerformHealthCheckLogic()
         {
-            try
-            {
-                // Attempt to open a connection to the database
-                await AppContext.Database.OpenConnectionAsync();
+            // Attempt to open a connection to the database
+            await AppContext.Database.OpenConnectionAsync();
 
-                // Check if the connection is open
-                if (AppContext.Database.GetDbConnection().State == ConnectionState.Open)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
+            // Check if the connection is open
+            if (AppContext.Database.GetDbConnection().State == ConnectionState.Open)
             {
-                _log.LogError("Error Stack: {StackTrace} \n Exception Message: {Message}", ex.StackTrace, ex.Message);
-                throw;
+                return true;
             }
+            else
+            {
+                return false;
+            }
+
         }
     }
 }

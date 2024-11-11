@@ -20,7 +20,7 @@ namespace Defra.PTS.Application.Api.Services.Implementation
             string uniqueReferenceNumber;
             do
             {
-                uniqueReferenceNumber = _applicationServiceHelper.GenerateUniqueAlphaNumericCode((int)ApplicationReferenceEnum.Length);
+                uniqueReferenceNumber = _applicationServiceHelper.GenerateUniqueAlphaNumericCode((int)ApplicationReference.Length);
             } while (await _applicationRepository.DoesReferenceNumberExists(uniqueReferenceNumber));
             return uniqueReferenceNumber;
         }
@@ -30,7 +30,7 @@ namespace Defra.PTS.Application.Api.Services.Implementation
             string travelDocumentReference;
             do
             {
-             travelDocumentReference = _travelDocumentServiceHelper.GenerateUniqueAlphaNumericCode((int)TravelDocumentReferenceEnum.Length);
+             travelDocumentReference = _travelDocumentServiceHelper.GenerateUniqueAlphaNumericCode((int)TravelDocumentReference.Length);
             } while (await _travelDocumentRepository.DoesTravelDocumentReferenceNumberExists(travelDocumentReference));
             return travelDocumentReference;
         }
