@@ -12,7 +12,6 @@ namespace Defra.PTS.Application.Repositories.Implementation
     [ExcludeFromCodeCoverageAttribute]
     public class ApplicationRepository : Repository<modelEntity.Application>, IApplicationRepository
     {
-        private readonly ILogger<ApplicationRepository> _log;
         private AppDbContext AppContext
         {
             get
@@ -20,9 +19,8 @@ namespace Defra.PTS.Application.Repositories.Implementation
                 return (AppDbContext)_dbContext;
             }
         }
-        public ApplicationRepository(DbContext dbContext, ILogger<ApplicationRepository> log) : base(dbContext)
+        public ApplicationRepository(DbContext dbContext) : base(dbContext)
         {
-            _log = log;
         }
 
         public async Task<VwApplication?> GetApplicationDetails(Guid applicationId)
@@ -59,26 +57,19 @@ namespace Defra.PTS.Application.Repositories.Implementation
 
         public async Task<bool> PerformHealthCheckLogic()
         {
-            try
-            {
-                // Attempt to open a connection to the database
-                await AppContext.Database.OpenConnectionAsync();
+            // Attempt to open a connection to the database
+            await AppContext.Database.OpenConnectionAsync();
 
-                // Check if the connection is open
-                if (AppContext.Database.GetDbConnection().State == ConnectionState.Open)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
+            // Check if the connection is open
+            if (AppContext.Database.GetDbConnection().State == ConnectionState.Open)
             {
-                _log.LogError("Error Stack: {StackTrace} \n Exception Message: {Message}", ex.StackTrace, ex.Message);
-                throw;
+                return true;
             }
+            else
+            {
+                return false;
+            }
+
         }
     }
 }
