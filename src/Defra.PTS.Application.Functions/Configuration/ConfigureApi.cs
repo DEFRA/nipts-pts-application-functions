@@ -23,6 +23,7 @@ namespace Defra.PTS.Application.Functions.Configuration
             services.AddScoped<IReferenceGeneratorService, ReferenceGeneratorService>();
             services.AddTransient<IApplicationServiceHelper, ApplicationServiceHelper>();
             services.AddScoped<ITravelDocumentServiceHelper, TravelDocumentServiceHelper>();
+            services.AddScoped<ISignatoryService, SignatoryService>();
             return services;
         }
     }

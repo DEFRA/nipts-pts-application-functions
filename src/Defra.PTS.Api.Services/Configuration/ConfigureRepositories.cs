@@ -21,6 +21,7 @@ namespace Defra.PTS.Application.Api.Services.Configuration
             services.AddScoped<DbContext, AppDbContext>();
             services.AddScoped<IApplicationRepository, ApplicationRepository>();
             services.AddScoped<ITravelDocumentRepository, TravelDocumentRepository>();
+            services.AddScoped<ISignatoryRepository, SignatoryRepository>();
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
 
             return services;

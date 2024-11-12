@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Defra.PTS.Application.Models.Dto;
 using Defra.PTS.Application.Functions.Application;
+using System.Text.Json;
 
 namespace Defra.PTS.Application.Functions.Tests.Controllers
 {
@@ -21,7 +22,7 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
         {
             _signatoryServiceMock = new Mock<ISignatoryService>();
             _loggerMock = new Mock<ILogger<SignatoryController>>();
-            sut = new SignatoryController(_signatoryServiceMock.Object, _loggerMock.Object);
+            sut = new SignatoryController(_signatoryServiceMock.Object);
         }
 
         [Test]
@@ -39,9 +40,10 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             };
             _signatoryServiceMock.Setup(service => service.GetLatestSignatory()).ReturnsAsync(signatoryDto);
             var httpRequestMock = new Mock<HttpRequest>();
+            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto())));
 
             // Act
-            var result = await sut!.GetLatestSignatory(httpRequestMock.Object);
+            var result = await sut!.GetLatestSignatory(httpRequestMock.Object, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -55,12 +57,15 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             // Arrange
             _signatoryServiceMock.Setup(service => service.GetLatestSignatory()).ReturnsAsync((SignatoryDto?)null);
             var httpRequestMock = new Mock<HttpRequest>();
+            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto())));
 
             // Act
-            var result = await sut!.GetLatestSignatory(httpRequestMock.Object);
+            var result = await sut!.GetLatestSignatory(httpRequestMock.Object, _loggerMock.Object);
 
             // Assert
-            Assert.IsInstanceOf<NotFoundResult>(result);
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = (OkObjectResult)result;
+            Assert.IsNull(okResult.Value);
         }
 
         [Test]
@@ -79,9 +84,10 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             };
             _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ReturnsAsync(signatoryDto);
             var httpRequestMock = new Mock<HttpRequest>();
+            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Id = signatoryId })));
 
             // Act
-            var result = await sut!.GetSignatoryById(httpRequestMock.Object, signatoryId);
+            var result = await sut!.GetSignatoryById(httpRequestMock.Object, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -96,12 +102,15 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             var signatoryId = Guid.NewGuid();
             _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ReturnsAsync((SignatoryDto?)null);
             var httpRequestMock = new Mock<HttpRequest>();
+            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Id = signatoryId })));
 
             // Act
-            var result = await sut!.GetSignatoryById(httpRequestMock.Object, signatoryId);
+            var result = await sut!.GetSignatoryById(httpRequestMock.Object, _loggerMock.Object);
 
             // Assert
-            Assert.IsInstanceOf<NotFoundResult>(result);
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = (OkObjectResult)result;
+            Assert.IsNull(okResult.Value);
         }
 
         [Test]
@@ -120,9 +129,10 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             };
             _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ReturnsAsync(signatoryDto);
             var httpRequestMock = new Mock<HttpRequest>();
+            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Name = name })));
 
             // Act
-            var result = await sut!.GetSignatoryByName(httpRequestMock.Object, name);
+            var result = await sut!.GetSignatoryByName(httpRequestMock.Object, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -137,12 +147,15 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             var name = "Nonexistent Signatory";
             _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ReturnsAsync((SignatoryDto?)null);
             var httpRequestMock = new Mock<HttpRequest>();
+            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Name = name })));
 
             // Act
-            var result = await sut!.GetSignatoryByName(httpRequestMock.Object, name);
+            var result = await sut!.GetSignatoryByName(httpRequestMock.Object, _loggerMock.Object);
 
             // Assert
-            Assert.IsInstanceOf<NotFoundResult>(result);
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = (OkObjectResult)result;
+            Assert.IsNull(okResult.Value);
         }
     }
 }
