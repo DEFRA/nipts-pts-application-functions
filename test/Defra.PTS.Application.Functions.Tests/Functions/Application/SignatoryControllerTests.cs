@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Defra.PTS.Application.Models.Dto;
+using Defra.PTS.Application.Functions.Application;
 
 namespace Defra.PTS.Application.Functions.Tests.Controllers
 {

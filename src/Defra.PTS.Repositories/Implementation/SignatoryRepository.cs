@@ -33,17 +33,16 @@ namespace Defra.PTS.Application.Repositories.Implementation
 
         public async Task<Signatory?> GetSignatoryById(Guid signatoryId)
         {
-            _log.LogInformation($"Getting signatory with ID: {signatoryId} from the database.");
+            _log.LogInformation("Getting signatory with ID: {SignatoryId} from the database.", signatoryId);
             return await AppContext.Signatories
                 .FirstOrDefaultAsync(s => s.ID == signatoryId);
         }
 
         public async Task<Signatory?> GetSignatoryByName(string name)
         {
-            _log.LogInformation($"Getting signatory with Name: {name} from the database.");
+            _log.LogInformation("Getting signatory with Name: {Name} from the database.", name);
             return await AppContext.Signatories
                 .FirstOrDefaultAsync(s => s.Name == name);
         }
     }
-
 }

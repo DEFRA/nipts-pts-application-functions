@@ -26,14 +26,14 @@ namespace Defra.PTS.Application.Api.Services.Implementation
 
         public async Task<SignatoryDto?> GetSignatoryById(Guid signatoryId)
         {
-            _logger.LogInformation($"Retrieving signatory with ID: {signatoryId}");
+            _logger.LogInformation("Retrieving signatory with ID: {SignatoryId}", signatoryId);
             var signatory = await _signatoryRepository.GetSignatoryById(signatoryId);
             return signatory != null ? MapToDto(signatory) : null;
         }
 
         public async Task<SignatoryDto?> GetSignatoryByName(string name)
         {
-            _logger.LogInformation($"Retrieving signatory with Name: {name}");
+            _logger.LogInformation("Retrieving signatory with Name: {Name}", name);
             var signatory = await _signatoryRepository.GetSignatoryByName(name);
             return signatory != null ? MapToDto(signatory) : null;
         }
