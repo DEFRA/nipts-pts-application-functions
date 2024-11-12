@@ -74,7 +74,7 @@ namespace Defra.PTS.Application.Functions.Application
             catch (Exception ex)
             {
                 log.LogError(ex, "An unexpected error occurred");
-                throw;
+                throw new Exception("An unexpected error occurred while retrieving the latest signatory", ex);
             }
         }
 
@@ -120,7 +120,7 @@ namespace Defra.PTS.Application.Functions.Application
             catch (Exception ex)
             {
                 log.LogError(ex, "An unexpected error occurred");
-                throw;
+                throw new Exception("An unexpected error occurred while retrieving getbyid", ex);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Defra.PTS.Application.Functions.Application
             catch (Exception ex)
             {
                 log.LogError(ex, "An unexpected error occurred");
-                throw;
+                throw new Exception("An unexpected error occurred while retrieving byname", ex);
             }
         }
     }
