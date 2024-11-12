@@ -16,5 +16,6 @@ namespace Defra.PTS.Application.Repositories
         public DbSet<modelEntity.Application> Application { get; set; }
         public DbSet<modelEntity.VwApplication> VwApplications { get; set; }
         public DbSet<modelEntity.TravelDocument> TravelDocument { get; set; }
+        public DbSet<modelEntity.Signatory> Signatories { get; set; }
     }
 }
