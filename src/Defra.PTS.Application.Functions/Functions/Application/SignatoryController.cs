@@ -22,6 +22,8 @@ namespace Defra.PTS.Application.Functions.Application
     public class SignatoryController
     {
         private readonly ISignatoryService _signatoryService;
+        private const string InvalidRequestBodyMessage = "Invalid request body, is NULL or Empty";
+        private const string ExceptionOccurredMessage = "An exception occurred";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SignatoryController"/> class.
@@ -47,7 +49,7 @@ namespace Defra.PTS.Application.Functions.Application
         {
             try
             {
-                var input = (req?.Body) ?? throw new InvalidDataException("Invalid request body, is NULL or Empty");
+                var input = (req?.Body) ?? throw new InvalidDataException(InvalidRequestBodyMessage);
                 string requestBody = await new StreamReader(input).ReadToEndAsync();
 
                 var signatoryRequest = JsonSerializer.Deserialize<SignatoryRequestDto>(requestBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -63,18 +65,18 @@ namespace Defra.PTS.Application.Functions.Application
             }
             catch (InvalidDataException ex)
             {
-                log.LogError(ex, "An exception occurred");
-                return new BadRequestObjectResult("Invalid request body, is NULL or Empty");
+                log.LogError(ex, ExceptionOccurredMessage);
+                return new BadRequestObjectResult(InvalidRequestBodyMessage);
             }
             catch (JsonException ex)
             {
-                log.LogError(ex, "An exception occurred");
+                log.LogError(ex, ExceptionOccurredMessage);
                 return new BadRequestObjectResult("Cannot deserialize request body");
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "An unexpected error occurred");
-                throw new Exception("An unexpected error occurred while retrieving the latest signatory", ex);
+                log.LogError(ex, ExceptionOccurredMessage);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -93,7 +95,7 @@ namespace Defra.PTS.Application.Functions.Application
         {
             try
             {
-                var input = (req?.Body) ?? throw new InvalidDataException("Invalid request body, is NULL or Empty");
+                var input = (req?.Body) ?? throw new InvalidDataException(InvalidRequestBodyMessage);
                 string requestBody = await new StreamReader(input).ReadToEndAsync();
 
                 var signatoryRequest = JsonSerializer.Deserialize<SignatoryRequestDto>(requestBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -109,18 +111,18 @@ namespace Defra.PTS.Application.Functions.Application
             }
             catch (InvalidDataException ex)
             {
-                log.LogError(ex, "An exception occurred");
-                return new BadRequestObjectResult("Invalid request body, is NULL or Empty");
+                log.LogError(ex, ExceptionOccurredMessage);
+                return new BadRequestObjectResult(InvalidRequestBodyMessage);
             }
             catch (JsonException ex)
             {
-                log.LogError(ex, "An exception occurred");
+                log.LogError(ex, ExceptionOccurredMessage);
                 return new BadRequestObjectResult("Cannot deserialize request body or Id is missing");
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "An unexpected error occurred");
-                throw new Exception("An unexpected error occurred while retrieving getbyid", ex);
+                log.LogError(ex, ExceptionOccurredMessage);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -139,7 +141,7 @@ namespace Defra.PTS.Application.Functions.Application
         {
             try
             {
-                var input = (req?.Body) ?? throw new InvalidDataException("Invalid request body, is NULL or Empty");
+                var input = (req?.Body) ?? throw new InvalidDataException(InvalidRequestBodyMessage);
                 string requestBody = await new StreamReader(input).ReadToEndAsync();
 
                 var signatoryRequest = JsonSerializer.Deserialize<SignatoryRequestDto>(requestBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -155,18 +157,18 @@ namespace Defra.PTS.Application.Functions.Application
             }
             catch (InvalidDataException ex)
             {
-                log.LogError(ex, "An exception occurred");
-                return new BadRequestObjectResult("Invalid request body, is NULL or Empty");
+                log.LogError(ex, ExceptionOccurredMessage);
+                return new BadRequestObjectResult(InvalidRequestBodyMessage);
             }
             catch (JsonException ex)
             {
-                log.LogError(ex, "An exception occurred");
+                log.LogError(ex, ExceptionOccurredMessage);
                 return new BadRequestObjectResult("Cannot deserialize request body or Name is missing");
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "An unexpected error occurred");
-                throw new Exception("An unexpected error occurred while retrieving byname", ex);
+                log.LogError(ex, ExceptionOccurredMessage);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
     }
