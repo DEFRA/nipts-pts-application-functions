@@ -3,11 +3,18 @@
 namespace Defra.PTS.Application.Models.Dto
 {
     [ExcludeFromCodeCoverageAttribute]
-    public class SignatoryRequestDto
+    public class SignatoryRequestNameDto
     {
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;        
+    }
+
+    [ExcludeFromCodeCoverageAttribute]
+    public class SignatoryRequestIdDto
+    {        
         public Guid Id { get; set; }
     }
+
+    [ExcludeFromCodeCoverageAttribute]
     public class SignatoryDto
     {
         public Guid ID { get; set; }
