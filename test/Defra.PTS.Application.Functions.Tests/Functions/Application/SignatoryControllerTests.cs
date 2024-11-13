@@ -39,11 +39,9 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
                 SignatureImage = Convert.FromBase64String("aW1hZ2VfZGF0YQ==")
             };
             _signatoryServiceMock.Setup(service => service.GetLatestSignatory()).ReturnsAsync(signatoryDto);
-            var httpRequestMock = new Mock<HttpRequest>();
-            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto())));
 
             // Act
-            var result = await sut!.GetLatestSignatory(httpRequestMock.Object, _loggerMock.Object);
+            var result = await sut!.GetLatestSignatory(new DefaultHttpContext().Request, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -56,11 +54,9 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
         {
             // Arrange
             _signatoryServiceMock.Setup(service => service.GetLatestSignatory()).ReturnsAsync((SignatoryDto?)null);
-            var httpRequestMock = new Mock<HttpRequest>();
-            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto())));
 
             // Act
-            var result = await sut!.GetLatestSignatory(httpRequestMock.Object, _loggerMock.Object);
+            var result = await sut!.GetLatestSignatory(new DefaultHttpContext().Request, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -83,11 +79,13 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
                 SignatureImage = Convert.FromBase64String("c2lnbmF0dXJlX2RhdGE=")
             };
             _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ReturnsAsync(signatoryDto);
-            var httpRequestMock = new Mock<HttpRequest>();
-            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Id = signatoryId })));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestIdDto { Id = signatoryId });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
 
             // Act
-            var result = await sut!.GetSignatoryById(httpRequestMock.Object, _loggerMock.Object);
+            var result = await sut!.GetSignatoryById(httpRequest, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -101,11 +99,13 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             // Arrange
             var signatoryId = Guid.NewGuid();
             _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ReturnsAsync((SignatoryDto?)null);
-            var httpRequestMock = new Mock<HttpRequest>();
-            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Id = signatoryId })));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestIdDto { Id = signatoryId });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
 
             // Act
-            var result = await sut!.GetSignatoryById(httpRequestMock.Object, _loggerMock.Object);
+            var result = await sut!.GetSignatoryById(httpRequest, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -128,11 +128,13 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
                 SignatureImage = Convert.FromBase64String("c2lnbmF0dXJlX2RhdGE=")
             };
             _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ReturnsAsync(signatoryDto);
-            var httpRequestMock = new Mock<HttpRequest>();
-            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Name = name })));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestNameDto { Name = name });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
 
             // Act
-            var result = await sut!.GetSignatoryByName(httpRequestMock.Object, _loggerMock.Object);
+            var result = await sut!.GetSignatoryByName(httpRequest, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -146,11 +148,13 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             // Arrange
             var name = "Nonexistent Signatory";
             _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ReturnsAsync((SignatoryDto?)null);
-            var httpRequestMock = new Mock<HttpRequest>();
-            httpRequestMock.Setup(req => req.Body).Returns(new MemoryStream(JsonSerializer.SerializeToUtf8Bytes(new SignatoryRequestDto { Name = name })));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestNameDto { Name = name });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
 
             // Act
-            var result = await sut!.GetSignatoryByName(httpRequestMock.Object, _loggerMock.Object);
+            var result = await sut!.GetSignatoryByName(httpRequest, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
