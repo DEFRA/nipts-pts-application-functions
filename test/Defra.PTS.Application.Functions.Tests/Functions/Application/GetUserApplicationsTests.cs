@@ -17,8 +17,8 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
     [TestFixture]
     public class GetUserApplicationsTests
     {
-        private Mock<IApplicationService> _applicationServiceMock;
-        private Mock<ILogger<GetUserApplications>> _loggerMock;
+        private Mock<IApplicationService>? _applicationServiceMock;
+        private Mock<ILogger<GetUserApplications>>? _loggerMock;
 
         [SetUp]
         public void Setup()
@@ -33,10 +33,10 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
             // Arrange
             var userId = Guid.NewGuid();
             var expectedApplications = new List<ApplicationSummaryDto>(); // Fill in with your expected result
-            _applicationServiceMock.Setup(service => service.GetApplicationsForUser(userId))
+            _applicationServiceMock!.Setup(service => service.GetApplicationsForUser(userId))
                                    .ReturnsAsync(expectedApplications);
             var httpRequestMock = new Mock<HttpRequest>();
-            var sut = new GetUserApplications(_applicationServiceMock.Object, _loggerMock.Object);
+            var sut = new GetUserApplications(_applicationServiceMock.Object, _loggerMock!.Object);
 
             // Act
             var result = await sut.Run(httpRequestMock.Object, userId.ToString());
@@ -53,7 +53,7 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
             // Arrange
             var invalidUserId = "invalid-id";
             var httpRequestMock = new Mock<HttpRequest>();
-            var sut = new GetUserApplications(_applicationServiceMock.Object, _loggerMock.Object);
+            var sut = new GetUserApplications(_applicationServiceMock!.Object, _loggerMock!.Object);
 
             // Act
             var result = await sut.Run(httpRequestMock.Object, invalidUserId);

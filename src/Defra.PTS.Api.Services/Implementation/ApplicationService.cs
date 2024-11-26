@@ -1,8 +1,8 @@
 ﻿using Defra.PTS.Application.Repositories.Interfaces;
 using Defra.PTS.Application.Api.Services.Interface;
 using Microsoft.Extensions.Logging;
-using model = Defra.PTS.Application.Models;
-using entity = Defra.PTS.Application.Entities;
+using applicationModel = Defra.PTS.Application.Models;
+using applicationEntity = Defra.PTS.Application.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,22 +20,16 @@ using Defra.PTS.Application.Models.Dto;
 
 namespace Defra.PTS.Application.Api.Services.Implementation
 {
-    public class ApplicationService : IApplicationService
-    {
-        private readonly ILogger<ApplicationService> _log;
-        private readonly IApplicationRepository _applicationRepository;
-        private readonly IReferenceGeneratorService _referenceGeneratorService;
-        public ApplicationService(
-              ILogger<ApplicationService> log
+    public class ApplicationService(
+          ILogger<ApplicationService> log
             , IApplicationRepository applicationRepository
-            , IReferenceGeneratorService referenceGeneratorService)
-        {
-            _log = log;
-            _applicationRepository = applicationRepository;
-            _referenceGeneratorService = referenceGeneratorService;
-        }
+            , IReferenceGeneratorService referenceGeneratorService) : IApplicationService
+    {
+        private readonly ILogger<ApplicationService> _log = log;
+        private readonly IApplicationRepository _applicationRepository = applicationRepository;
+        private readonly IReferenceGeneratorService _referenceGeneratorService = referenceGeneratorService;
 
-        public async Task<entity.Application> CreateApplication(entity.Application application)
+        public async Task<applicationEntity.Application> CreateApplication(applicationEntity.Application application)
         {
 
             var uniqueReferenceNumber = await _referenceGeneratorService.GetUniqueApplicationReference();
@@ -53,7 +47,7 @@ namespace Defra.PTS.Application.Api.Services.Implementation
             return application;
         }
 
-        public entity.Application GetApplication(Guid id)
+        public applicationEntity.Application GetApplication(Guid id)
         {
             _log.LogInformation("Running inside method {0}", "GetApplication");
             return _applicationRepository.GetApplication(id);

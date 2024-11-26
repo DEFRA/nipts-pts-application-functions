@@ -5,9 +5,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Defra.PTS.Application.Functions.Configuration
 {
-    [ExcludeFromCodeCoverageAttribute]
+    /// <summary>
+    /// Configures service dependancies
+    /// </summary>
+    [ExcludeFromCodeCoverageAttribute]    
     public static class ConfigureApi
     {
+        /// <summary>
+        /// Adds service dependancies
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddDefraApiServices(this IServiceCollection services)
         {
             services.AddScoped<IApplicationService, ApplicationService>();
@@ -15,6 +23,7 @@ namespace Defra.PTS.Application.Functions.Configuration
             services.AddScoped<IReferenceGeneratorService, ReferenceGeneratorService>();
             services.AddTransient<IApplicationServiceHelper, ApplicationServiceHelper>();
             services.AddScoped<ITravelDocumentServiceHelper, TravelDocumentServiceHelper>();
+            services.AddScoped<ISignatoryService, SignatoryService>();
             return services;
         }
     }

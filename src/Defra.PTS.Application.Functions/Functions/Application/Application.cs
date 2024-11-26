@@ -13,34 +13,34 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using model = Defra.PTS.Application.Models;
-using entity = Defra.PTS.Application.Entities;
+using applicationModel = Defra.PTS.Application.Models;
+using modelEntity = Defra.PTS.Application.Entities;
 using Defra.PTS.Application.Models.Dto;
+using System.Web.Http;
+using System.Diagnostics;
 
 namespace Defra.PTS.Application.Functions.Functions.Application
 {
-    public class Application
+    /// <summary>
+    /// Application API
+    /// </summary>
+    public class Application(IApplicationService applicationService, ITravelDocumentService travelDocumentService)
     {
-        private readonly IApplicationService _applicationService;
-        private readonly ITravelDocumentService _travelDocumentService;
-        public Application(IApplicationService applicationService, ITravelDocumentService travelDocumentService)
-        {
-            _applicationService = applicationService;
-            _travelDocumentService = travelDocumentService;
-        }
+        private readonly IApplicationService _applicationService = applicationService;
+        private readonly ITravelDocumentService _travelDocumentService = travelDocumentService;        
 
 
-        /// <summary>
-        /// Create Application
-        /// </summary>
-        /// <param name="req"></param>
-        /// <param name="log"></param>
-        /// <returns></returns>
-        /// <exception cref="ApplicationFunctionException"></exception>
-        [FunctionName("CreateApplication")]
-        [OpenApiOperation(operationId: "CreateApplication", tags: new[] { "Create Application" })]
+    /// <summary>
+    /// Create Application
+    /// </summary>
+    /// <param name="req"></param>
+    /// <param name="log"></param>
+    /// <returns></returns>
+    /// <exception cref="ApplicationFunctionException"></exception>
+    [FunctionName("CreateApplication")]
+        [OpenApiOperation(operationId: "CreateApplication", tags: ["Create Application"])]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(model.Application), Description = "Create Application")]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(applicationModel.Application), Description = "Create Application")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Description = "The OK response")]
         public async Task<IActionResult> CreateApplication(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "application")] HttpRequest req,
@@ -49,29 +49,28 @@ namespace Defra.PTS.Application.Functions.Functions.Application
             try
             {
                 var inputData = req?.Body;
-                if (inputData == null)
+                if (inputData != null)
                 {
-                    throw new ApplicationFunctionException("Invalid Application input, is NUll or Empty");
+                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                    modelEntity.Application application = JsonConvert.DeserializeObject<modelEntity.Application>(requestBody, new JsonSerializerSettings
+                    {
+                        MissingMemberHandling = MissingMemberHandling.Error,
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+
+                    var response = await _applicationService.CreateApplication(application);
+                    await _travelDocumentService.CreateTravelDocument(response);
+                    var responseDto = new ApplicationDto() { Id = response.Id, ReferenceNumber = response.ReferenceNumber };
+
+                    return new OkObjectResult(responseDto);
                 }
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                entity.Application application = JsonConvert.DeserializeObject<entity.Application>(requestBody, new JsonSerializerSettings
-                {
-                    MissingMemberHandling = MissingMemberHandling.Error, 
-                    NullValueHandling = NullValueHandling.Ignore
-                });
-
-                var response = await _applicationService.CreateApplication(application);
-                await _travelDocumentService.CreateTravelDocument(response);
-                var responseDto = new ApplicationDto() { Id = response.Id, ReferenceNumber = response.ReferenceNumber };
-
-                return new OkObjectResult(responseDto);
+                throw new ApplicationFunctionException("Invalid Application input, is NUll or Empty");
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error Stack: ", ex.StackTrace);
-                log.LogError(ex, "Exception Message: ", ex.Message);
+                log.LogError(ex, "Error Stack: {StackTrace} \n Exception Message: {Message}", ex.StackTrace, ex.Message);
 
-                throw;
+                return new BadRequestObjectResult("Error creating application");
             }
         }
     }
