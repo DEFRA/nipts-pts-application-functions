@@ -79,12 +79,12 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             var mockLogger = new Mock<ILogger>();
 
             // Act
-            var result = await sut.GetLatestSignatory(mockHttpRequest.Object, _loggerMock.Object);
+            var result = await sut!.GetLatestSignatory(mockHttpRequest.Object, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type
             var statusCodeResult = result as StatusCodeResult;
-            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult!.StatusCode);
 
         }
 
@@ -215,7 +215,7 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             // Assert
             Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type
             var statusCodeResult = result as StatusCodeResult;
-            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult!.StatusCode);
         }
 
 
@@ -346,7 +346,7 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             // Assert
             Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type
             var statusCodeResult = result as StatusCodeResult;
-            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult!.StatusCode);
         }
     }
 }
