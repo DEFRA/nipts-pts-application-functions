@@ -25,6 +25,15 @@ namespace Defra.PTS.Application.Functions.Application
         private const string InvalidRequestBodyMessage = "Invalid request body, is NULL or Empty";
         private const string ExceptionOccurredMessage = "An exception occurred";
 
+        private const string SignatoryNameTagName = "GetSignatoryByName"; 
+        private const string SignatoryIdTagName = "GetSignatoryByName"; 
+        private const string SignatoryLatestTagName = "GetLatestSignatory";
+
+        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SignatoryController"/> class.
         /// </summary>
@@ -39,7 +48,7 @@ namespace Defra.PTS.Application.Functions.Application
         /// </summary>
         /// <returns>The latest signatory information.</returns>
         [FunctionName("GetLatestSignatory")]
-        [OpenApiOperation(operationId: "GetLatestSignatory", tags: new[] { "GetLatestSignatory" })]
+        [OpenApiOperation(operationId: "GetLatestSignatory", tags: SignatoryLatestTagName)]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(SignatoryDto), Description = "OK")]
         public async Task<IActionResult> GetLatestSignatory(
@@ -65,7 +74,7 @@ namespace Defra.PTS.Application.Functions.Application
         /// </summary>
         /// <returns>The signatory information.</returns>
         [FunctionName("GetSignatoryById")]
-        [OpenApiOperation(operationId: "GetSignatoryById", tags: new[] { "GetSignatoryById" })]
+        [OpenApiOperation(operationId: "GetSignatoryById", tags: SignatoryIdTagName)]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(SignatoryRequestIdDto), Description = "Signatory request data")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(SignatoryDto), Description = "OK")]
@@ -78,7 +87,7 @@ namespace Defra.PTS.Application.Functions.Application
                 var input = (req?.Body) ?? throw new InvalidDataException(InvalidRequestBodyMessage);
                 string requestBody = await new StreamReader(input).ReadToEndAsync();
 
-                var signatoryRequest = JsonSerializer.Deserialize<SignatoryRequestIdDto>(requestBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var signatoryRequest = JsonSerializer.Deserialize<SignatoryRequestIdDto>(requestBody, _jsonOptions);
 
                 if (signatoryRequest == null || signatoryRequest.Id == Guid.Empty)
                 {
@@ -111,7 +120,7 @@ namespace Defra.PTS.Application.Functions.Application
         /// </summary>
         /// <returns>The signatory information.</returns>
         [FunctionName("GetSignatoryByName")]
-        [OpenApiOperation(operationId: "GetSignatoryByName", tags: new[] { "GetSignatoryByName" })]
+        [OpenApiOperation(operationId: "GetSignatoryByName", tags: SignatoryNameTagName)]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(SignatoryRequestNameDto), Description = "Signatory request data")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(SignatoryDto), Description = "OK")]
@@ -124,7 +133,7 @@ namespace Defra.PTS.Application.Functions.Application
                 var input = (req?.Body) ?? throw new InvalidDataException(InvalidRequestBodyMessage);
                 string requestBody = await new StreamReader(input).ReadToEndAsync();
 
-                var signatoryRequest = JsonSerializer.Deserialize<SignatoryRequestNameDto>(requestBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var signatoryRequest = JsonSerializer.Deserialize<SignatoryRequestNameDto>(requestBody, _jsonOptions);
 
                 if (signatoryRequest == null || string.IsNullOrWhiteSpace(signatoryRequest.Name))
                 {

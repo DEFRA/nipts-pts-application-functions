@@ -16,6 +16,9 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
         private Mock<ISignatoryService> _signatoryServiceMock = new();
         private Mock<ILogger<SignatoryController>> _loggerMock = new();
         private SignatoryController? sut;
+        private const string InvalidRequestBodyMessage = "Invalid request body, is NULL or Empty";
+        private const string InvalidJsonMessage = "Cannot deserialize request body or Id is missing";
+        private const string InvalidJsonMessageByName = "Cannot deserialize request body or Name is missing";
 
         [SetUp]
         public void SetUp()
@@ -62,6 +65,27 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
             var okResult = (OkObjectResult)result;
             Assert.IsNull(okResult.Value);
+        }
+
+        [Test]
+        public async Task GetLatestSignatory_WhenServiceThrowsException_ReturnsInternalServerError()
+        {
+            // Arrange
+            _signatoryServiceMock
+                .Setup(service => service.GetLatestSignatory())
+                .ThrowsAsync(new Exception("Service exception"));
+
+            var mockHttpRequest = new Mock<HttpRequest>();
+            var mockLogger = new Mock<ILogger>();
+
+            // Act
+            var result = await sut!.GetLatestSignatory(mockHttpRequest.Object, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult!.StatusCode);
+
         }
 
         [Test]
@@ -114,6 +138,88 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
         }
 
         [Test]
+        public async Task GetSignatoryById_WhenServiceThrowsException_InvalidDataException_ReturnsBadRequestObjectResult()
+        {
+            // Arrange
+            var signatoryId = Guid.NewGuid();
+            _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ThrowsAsync(new InvalidDataException("Service exception"));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestIdDto { Id = signatoryId });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryById(httpRequest, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var basdResult = (BadRequestObjectResult)result;
+            Assert.AreEqual(InvalidRequestBodyMessage, basdResult.Value);
+        }
+
+        [Test]
+        public async Task GetSignatoryById_WhenServiceThrowsException_JsonExceptionWhenReturns_EmptyGuid_ReturnsBadRequestObjectResult()
+        {
+            // Arrange
+            var signatoryId = Guid.Empty;
+            _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ThrowsAsync(new JsonException(InvalidJsonMessage));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestIdDto { Id = signatoryId });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryById(httpRequest, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var basdResult = (BadRequestObjectResult)result;
+            Assert.AreEqual(InvalidJsonMessage, basdResult.Value);
+        }
+
+
+        [Test]
+        public async Task GetSignatoryById_WhenServiceThrowsException_JsonException_ReturnsBadRequestObjectResult()
+        {
+            // Arrange
+            var signatoryId = Guid.NewGuid();
+            _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ThrowsAsync(new JsonException(InvalidJsonMessage));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestIdDto { Id = signatoryId });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryById(httpRequest, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var basdResult = (BadRequestObjectResult)result;
+            Assert.AreEqual(InvalidJsonMessage, basdResult.Value);
+        }
+
+        [Test]
+        public async Task GetSignatoryById_WhenServiceThrowsException_Exception_ReturnsStatusCodeResult()
+        {
+            // Arrange
+            var signatoryId = Guid.NewGuid();
+            _signatoryServiceMock.Setup(service => service.GetSignatoryById(signatoryId)).ThrowsAsync(new Exception(InvalidJsonMessage));
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestIdDto { Id = signatoryId });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryById(httpRequest, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult!.StatusCode);
+        }
+
+
+        [Test]
         public async Task GetSignatoryByName_WhenSignatoryExists_ReturnsOkResult()
         {
             // Arrange
@@ -160,6 +266,87 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
             var okResult = (OkObjectResult)result;
             Assert.IsNull(okResult.Value);
+        }
+
+        [Test]
+        public async Task GetSignatoryByName_WhenSignatoryDoesNotExist_InvalidDataException_ReturnsBadRequestObjectResult()
+        {
+            // Arrange
+            var name = "Nonexistent Signatory";
+            _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ThrowsAsync(new InvalidDataException("Service exception")); ;
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestNameDto { Name = name });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryByName(httpRequest, _loggerMock.Object);
+
+            // Assert
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var basdResult = (BadRequestObjectResult)result;
+            Assert.AreEqual(InvalidRequestBodyMessage, basdResult.Value);
+        }
+
+        [Test]
+        public async Task GetSignatoryByName_WhenSignatoryDoesNotExist_JsonExceptionWhenReturns_EmptyGuid_ReturnsBadRequestObjectResult()
+        {
+            // Arrange
+            var name = "";
+            _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ThrowsAsync(new JsonException(InvalidJsonMessageByName)); ;
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestNameDto { Name = name });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryByName(httpRequest, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var basdResult = (BadRequestObjectResult)result;
+            Assert.AreEqual(InvalidJsonMessageByName, basdResult.Value);
+        }
+
+        [Test]
+        public async Task GetSignatoryByName_WhenSignatoryDoesNotExist_JsonException_ReturnsBadRequestObjectResult()
+        {
+            // Arrange
+            var name = "Nonexistent Signatory";
+            _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ThrowsAsync(new JsonException(InvalidJsonMessageByName)); ;
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestNameDto { Name = name });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryByName(httpRequest, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var basdResult = (BadRequestObjectResult)result;
+            Assert.AreEqual(InvalidJsonMessageByName, basdResult.Value);
+        }
+
+        [Test]
+        public async Task GetSignatoryByName_WhenSignatoryDoesNotExist_Exception_ReturnsStatusCodeResult()
+        {
+            // Arrange
+            var name = "Nonexistent Signatory";
+            _signatoryServiceMock.Setup(service => service.GetSignatoryByName(name)).ThrowsAsync(new Exception(InvalidJsonMessageByName)); ;
+
+            var httpRequest = new DefaultHttpContext().Request;
+            var requestBody = JsonSerializer.Serialize(new SignatoryRequestNameDto { Name = name });
+            httpRequest.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+
+            // Act
+            var result = await sut!.GetSignatoryByName(httpRequest, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult!.StatusCode);
         }
     }
 }

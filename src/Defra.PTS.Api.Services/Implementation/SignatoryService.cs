@@ -38,7 +38,7 @@ namespace Defra.PTS.Application.Api.Services.Implementation
             return signatory != null ? MapToDto(signatory) : null;
         }
 
-        private SignatoryDto MapToDto(Signatory signatory)
+        private static SignatoryDto MapToDto(Signatory signatory)
         {
             return new SignatoryDto
             {
