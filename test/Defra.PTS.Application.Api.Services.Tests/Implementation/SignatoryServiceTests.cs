@@ -60,6 +60,19 @@ namespace Defra.PTS.Application.Api.Services.Tests.Implementation
         }
 
         [Test]
+        public async Task GetCurrentSignatory_WhenSignatoryDoesNotExist_ReturnsNull()
+        {
+            // Arrange
+            _signatoryRepositoryMock.Setup(repo => repo.GetCurrentSignatory()).ReturnsAsync((Signatory?)null);
+
+            // Act
+            var result = await sut!.GetCurrentSignatory();
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [Test]
         public async Task GetSignatoryById_WhenSignatoryExists_ReturnsSignatoryDto()
         {
             // Arrange

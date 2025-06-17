@@ -76,8 +76,8 @@ namespace Defra.PTS.Application.Functions.Functions.Application
                         return new NotFoundObjectResult($"No application found for id {applicationDetail.ApplicationId}");
                     }
 
-                    // Get Latest Signatory
-                    var signatoryResponse = await _signatoryService.GetLatestSignatory();
+                    // Get Current Signatory
+                    var signatoryResponse = await _signatoryService.GetCurrentSignatory();
                     if (signatoryResponse == null)
                     {
                         return new NotFoundObjectResult("No signatory information available");
