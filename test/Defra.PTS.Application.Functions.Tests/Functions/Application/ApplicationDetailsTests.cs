@@ -96,8 +96,8 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
             _applicationServiceMoq.Setup(service => service.GetApplicationDetails(applicationId))
                                   .ReturnsAsync(expectedApplicationDetails);
 
-            _signatoryServiceMoq.Setup(service => service.GetLatestSignatory())
-                                .ReturnsAsync((SignatoryDto)null!);
+            _signatoryServiceMoq.Setup(service => service.GetCurrentSignatory())
+                    .ReturnsAsync((SignatoryDto)null!);
 
             // Act
             var result = await _sut.GetApplicationDetails(_requestMoq.Object);
@@ -133,7 +133,7 @@ namespace Defra.PTS.Application.Functions.Tests.Functions.Application
             _applicationServiceMoq.Setup(service => service.GetApplicationDetails(applicationId))
                                   .ReturnsAsync(expectedApplicationDetails);
 
-            _signatoryServiceMoq.Setup(service => service.GetLatestSignatory())
+            _signatoryServiceMoq.Setup(service => service.GetCurrentSignatory())
                                 .ReturnsAsync(expectedSignatoryDetails);
 
             // Act

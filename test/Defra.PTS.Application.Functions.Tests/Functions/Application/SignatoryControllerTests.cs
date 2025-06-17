@@ -53,6 +53,30 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
         }
 
         [Test]
+        public async Task GetCurrentSignatory_WhenSignatoryExists_ReturnsOkResult()
+        {
+            // Arrange
+            var signatoryDto = new SignatoryDto
+            {
+                ID = Guid.NewGuid(),
+                Name = "John Doe",
+                Title = "Manager",
+                ValidFrom = DateTime.Now.AddYears(-1),
+                ValidTo = DateTime.Now.AddYears(1),
+                SignatureImage = Convert.FromBase64String("aW1hZ2VfZGF0YQ==")
+            };
+            _signatoryServiceMock.Setup(service => service.GetCurrentSignatory()).ReturnsAsync(signatoryDto);
+
+            // Act
+            var result = await sut!.GetCurrentSignatory(new DefaultHttpContext().Request, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = (OkObjectResult)result;
+            Assert.AreEqual(signatoryDto, okResult.Value);
+        }
+
+        [Test]
         public async Task GetLatestSignatory_WhenSignatoryDoesNotExist_ReturnsNotFoundResult()
         {
             // Arrange
@@ -60,6 +84,21 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
 
             // Act
             var result = await sut!.GetLatestSignatory(new DefaultHttpContext().Request, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = (OkObjectResult)result;
+            Assert.IsNull(okResult.Value);
+        }
+
+        [Test]
+        public async Task GetCurrentSignatory_WhenSignatoryDoesNotExist_ReturnsNotFoundResult()
+        {
+            // Arrange
+            _signatoryServiceMock.Setup(service => service.GetCurrentSignatory()).ReturnsAsync((SignatoryDto?)null);
+
+            // Act
+            var result = await sut!.GetCurrentSignatory(new DefaultHttpContext().Request, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -80,6 +119,27 @@ namespace Defra.PTS.Application.Functions.Tests.Controllers
 
             // Act
             var result = await sut!.GetLatestSignatory(mockHttpRequest.Object, _loggerMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult!.StatusCode);
+
+        }
+
+        [Test]
+        public async Task GetCurrentSignatory_WhenServiceThrowsException_ReturnsInternalServerError()
+        {
+            // Arrange
+            _signatoryServiceMock
+                .Setup(service => service.GetCurrentSignatory())
+                .ThrowsAsync(new Exception("Service exception"));
+
+            var mockHttpRequest = new Mock<HttpRequest>();
+            var mockLogger = new Mock<ILogger>();
+
+            // Act
+            var result = await sut!.GetCurrentSignatory(mockHttpRequest.Object, _loggerMock.Object);
 
             // Assert
             Assert.IsInstanceOf<StatusCodeResult>(result); // Verify the result is of the correct type

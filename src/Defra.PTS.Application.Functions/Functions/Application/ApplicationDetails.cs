@@ -30,6 +30,8 @@ namespace Defra.PTS.Application.Functions.Functions.Application
         private readonly ISignatoryService _signatoryService;
         private readonly ILogger<ApplicationDetails> _logger;
 
+        private const string _getApplicationDetailsTag = "GetApplicationDetails";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationDetails"/> class.
         /// </summary>
@@ -50,7 +52,7 @@ namespace Defra.PTS.Application.Functions.Functions.Application
         /// <returns>The application details</returns>
         /// <exception cref="ApplicationFunctionException">Thrown when the application ID input is invalid</exception>
         [FunctionName("GetApplicationDetails")]
-        [OpenApiOperation(operationId: "GetApplicationDetails", tags: ["GetApplicationDetails"])]
+        [OpenApiOperation(operationId: "GetApplicationDetails", tags: _getApplicationDetailsTag)]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(applicationModel.ApplicationDetail), Description = "Get Application Details")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(object), Description = "The OK response")]
@@ -76,8 +78,8 @@ namespace Defra.PTS.Application.Functions.Functions.Application
                         return new NotFoundObjectResult($"No application found for id {applicationDetail.ApplicationId}");
                     }
 
-                    // Get Latest Signatory
-                    var signatoryResponse = await _signatoryService.GetLatestSignatory();
+                    // Get Current Signatory
+                    var signatoryResponse = await _signatoryService.GetCurrentSignatory();
                     if (signatoryResponse == null)
                     {
                         return new NotFoundObjectResult("No signatory information available");

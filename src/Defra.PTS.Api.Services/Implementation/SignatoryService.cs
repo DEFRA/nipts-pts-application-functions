@@ -24,6 +24,13 @@ namespace Defra.PTS.Application.Api.Services.Implementation
             return signatory != null ? MapToDto(signatory) : null;
         }
 
+        public async Task<SignatoryDto?> GetCurrentSignatory()
+        {
+            _logger.LogInformation("Retrieving the latest signatory.");
+            var signatory = await _signatoryRepository.GetCurrentSignatory();
+            return signatory != null ? MapToDto(signatory) : null;
+        }
+
         public async Task<SignatoryDto?> GetSignatoryById(Guid signatoryId)
         {
             _logger.LogInformation("Retrieving signatory with ID: {SignatoryId}", signatoryId);
