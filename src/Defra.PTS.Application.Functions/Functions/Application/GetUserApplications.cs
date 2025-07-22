@@ -35,7 +35,7 @@ public class GetUserApplications(IApplicationService applicationService, ILogger
     /// <param name="userId"></param>
     /// <returns></returns>
     [FunctionName(nameof(GetUserApplications))]
-    [OpenApiOperation(operationId: nameof(GetUserApplications), tags: ["Applications"])]
+    [OpenApiOperation(operationId: nameof(GetUserApplications), tags: "Applications")]
     [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
     [OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "The **UserId** parameter")]
     [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<ApplicationSummaryDto>), Description = "OK")]
