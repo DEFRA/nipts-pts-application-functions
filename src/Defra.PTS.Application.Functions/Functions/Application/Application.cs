@@ -38,7 +38,7 @@ namespace Defra.PTS.Application.Functions.Functions.Application
     /// <returns></returns>
     /// <exception cref="ApplicationFunctionException"></exception>
     [FunctionName("CreateApplication")]
-        [OpenApiOperation(operationId: "CreateApplication", tags: ["Create Application"])]
+        [OpenApiOperation(operationId: "CreateApplication", tags: "Create Application")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(applicationModel.Application), Description = "Create Application")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Description = "The OK response")]
