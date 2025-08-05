@@ -63,7 +63,9 @@ namespace Defra.PTS.Application.Api.Services.Implementation
                 PetName = x.PetName ?? string.Empty,
                 PetSpeciesId = x.PetSpeciesId.GetValueOrDefault(),
                 ReferenceNumber = x.ReferenceNumber ?? string.Empty,
-                Status = x.Status ?? string.Empty
+                Status = x.Status ?? string.Empty,
+                DocumentIssueDate = x.DocumentIssueDate,
+                DateOfApplication = x.DateOfApplication,
             });
         }
 
