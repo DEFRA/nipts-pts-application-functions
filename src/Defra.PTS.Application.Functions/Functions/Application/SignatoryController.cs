@@ -28,6 +28,7 @@ namespace Defra.PTS.Application.Functions.Application
         private const string SignatoryNameTagName = "GetSignatoryByName"; 
         private const string SignatoryIdTagName = "GetSignatoryByName"; 
         private const string SignatoryLatestTagName = "GetLatestSignatory";
+        private const string SignatoryCurrentTagName = "GetCurrentSignatory";
 
         private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
@@ -67,7 +68,29 @@ namespace Defra.PTS.Application.Functions.Application
             }
         }
 
-
+        /// <summary>
+        /// Retrieves the current signatory.
+        /// </summary>
+        /// <returns>The current signatory information.</returns>
+        [FunctionName("GetCurrentSignatory")]
+        [OpenApiOperation(operationId: "GetCurrentSignatory", tags: SignatoryCurrentTagName)]
+        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(SignatoryDto), Description = "OK")]
+        public async Task<IActionResult> GetCurrentSignatory(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "signatories/current")] HttpRequest req,
+            ILogger log)
+        {
+            try
+            {
+                var signatoryDto = await _signatoryService.GetCurrentSignatory();
+                return new OkObjectResult(signatoryDto);
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, ExceptionOccurredMessage);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
 
         /// <summary>
         /// Retrieves a signatory by ID.

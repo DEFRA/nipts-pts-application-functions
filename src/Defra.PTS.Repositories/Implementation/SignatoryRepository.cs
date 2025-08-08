@@ -31,6 +31,19 @@ namespace Defra.PTS.Application.Repositories.Implementation
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Signatory?> GetCurrentSignatory()
+        {
+            //We need to filter based on ValidToAndValidFrom?
+            _log.LogInformation("Getting the current signatory from the database.");
+
+            var today = DateTime.UtcNow.Date;
+
+            return await AppContext.Signatories
+                .Where(s => s.ValidFrom.Date <= today && s.ValidTo.Date >= today)
+                .OrderByDescending(s => s.ValidFrom.Date)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Signatory?> GetSignatoryById(Guid signatoryId)
         {
             _log.LogInformation("Getting signatory with ID: {SignatoryId} from the database.", signatoryId);
