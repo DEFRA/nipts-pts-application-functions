@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Defra.PTS.Application.Repositories.Implementation
 {
     [ExcludeFromCodeCoverageAttribute]
-    public class SignatoryRepository : Repository<Signatory>, ISignatoryRepository
+    public partial class SignatoryRepository : Repository<Signatory>, ISignatoryRepository
     {
         private readonly ILogger<SignatoryRepository> _log;
         private AppDbContext AppContext
@@ -25,7 +25,7 @@ namespace Defra.PTS.Application.Repositories.Implementation
 
         public async Task<Signatory?> GetLatestSignatory()
         {
-            _log.LogInformation("Getting the latest signatory from the database.");
+            LogGettingLatestSignatory();
             return await AppContext.Signatories
                 .OrderByDescending(s => s.ValidFrom)
                 .FirstOrDefaultAsync();
@@ -34,7 +34,7 @@ namespace Defra.PTS.Application.Repositories.Implementation
         public async Task<Signatory?> GetCurrentSignatory()
         {
             //We need to filter based on ValidToAndValidFrom?
-            _log.LogInformation("Getting the current signatory from the database.");
+            LogGettingCurrentSignatory();
 
             var today = DateTime.UtcNow.Date;
 
@@ -46,16 +46,28 @@ namespace Defra.PTS.Application.Repositories.Implementation
 
         public async Task<Signatory?> GetSignatoryById(Guid signatoryId)
         {
-            _log.LogInformation("Getting signatory with ID: {SignatoryId} from the database.", signatoryId);
+            LogGettingSignatoryById(signatoryId);
             return await AppContext.Signatories
                 .FirstOrDefaultAsync(s => s.ID == signatoryId);
         }
 
         public async Task<Signatory?> GetSignatoryByName(string name)
         {
-            _log.LogInformation("Getting signatory with Name: {Name} from the database.", name);
+            LogGettingSignatoryByName(name);
             return await AppContext.Signatories
                 .FirstOrDefaultAsync(s => s.Name == name);
         }
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Getting the latest signatory from the database.")]
+        private partial void LogGettingLatestSignatory();
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Getting the current signatory from the database.")]
+        private partial void LogGettingCurrentSignatory();
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Getting signatory with ID: {SignatoryId} from the database.")]
+        private partial void LogGettingSignatoryById(Guid signatoryId);
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Getting signatory with Name: {Name} from the database.")]
+        private partial void LogGettingSignatoryByName(string name);
     }
 }

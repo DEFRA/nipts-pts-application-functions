@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Defra.PTS.Application.Api.Services.Implementation
 {
-    public class SignatoryService : ISignatoryService
+    public partial class SignatoryService : ISignatoryService
     {
         private readonly ISignatoryRepository _signatoryRepository;
         private readonly ILogger<SignatoryService> _logger;
@@ -19,28 +19,28 @@ namespace Defra.PTS.Application.Api.Services.Implementation
 
         public async Task<SignatoryDto?> GetLatestSignatory()
         {
-            _logger.LogInformation("Retrieving the latest signatory.");
+            LogRetrievingLatestSignatory();
             var signatory = await _signatoryRepository.GetLatestSignatory();
             return signatory != null ? MapToDto(signatory) : null;
         }
 
         public async Task<SignatoryDto?> GetCurrentSignatory()
         {
-            _logger.LogInformation("Retrieving the latest signatory.");
+            LogRetrievingLatestSignatory();
             var signatory = await _signatoryRepository.GetCurrentSignatory();
             return signatory != null ? MapToDto(signatory) : null;
         }
 
         public async Task<SignatoryDto?> GetSignatoryById(Guid signatoryId)
         {
-            _logger.LogInformation("Retrieving signatory with ID: {SignatoryId}", signatoryId);
+            LogRetrievingSignatoryById(signatoryId);
             var signatory = await _signatoryRepository.GetSignatoryById(signatoryId);
             return signatory != null ? MapToDto(signatory) : null;
         }
 
         public async Task<SignatoryDto?> GetSignatoryByName(string name)
         {
-            _logger.LogInformation("Retrieving signatory with Name: {Name}", name);
+            LogRetrievingSignatoryByName(name);
             var signatory = await _signatoryRepository.GetSignatoryByName(name);
             return signatory != null ? MapToDto(signatory) : null;
         }
@@ -57,5 +57,14 @@ namespace Defra.PTS.Application.Api.Services.Implementation
                 SignatureImage = signatory.SignatureImage
             };
         }
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Retrieving the latest signatory.")]
+        private partial void LogRetrievingLatestSignatory();
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Retrieving signatory with ID: {SignatoryId}")]
+        private partial void LogRetrievingSignatoryById(Guid signatoryId);
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Retrieving signatory with Name: {Name}")]
+        private partial void LogRetrievingSignatoryByName(string name);
     }
 }
