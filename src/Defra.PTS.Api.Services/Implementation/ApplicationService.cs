@@ -20,7 +20,7 @@ using Defra.PTS.Application.Models.Dto;
 
 namespace Defra.PTS.Application.Api.Services.Implementation
 {
-    public class ApplicationService(
+    public partial class ApplicationService(
           ILogger<ApplicationService> log
             , IApplicationRepository applicationRepository
             , IReferenceGeneratorService referenceGeneratorService) : IApplicationService
@@ -49,7 +49,7 @@ namespace Defra.PTS.Application.Api.Services.Implementation
 
         public applicationEntity.Application GetApplication(Guid id)
         {
-            _log.LogInformation("Running inside method {MethodName}", nameof(GetApplication));
+            LogRunningInsideMethod(nameof(GetApplication));
             return _applicationRepository.GetApplication(id);
         }
 
@@ -78,5 +78,8 @@ namespace Defra.PTS.Application.Api.Services.Implementation
         {
               return await _applicationRepository.PerformHealthCheckLogic();
         }
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "Running inside method {MethodName}")]
+        private partial void LogRunningInsideMethod(string methodName);
     }
 }
